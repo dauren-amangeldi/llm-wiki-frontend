@@ -1,0 +1,145 @@
+/* ── Self-hosted fonts (no CDN dependency) ── */
+@font-face { font-family: "Golos Text"; font-weight: 400; font-style: normal; font-display: swap; src: url("/fonts/golos-text-400.woff2") format("woff2"); }
+@font-face { font-family: "Golos Text"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/golos-text-500.woff2") format("woff2"); }
+@font-face { font-family: "Golos Text"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/golos-text-600.woff2") format("woff2"); }
+@font-face { font-family: "Golos Text"; font-weight: 700; font-style: normal; font-display: swap; src: url("/fonts/golos-text-700.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 500; font-style: normal; font-display: swap; src: url("/fonts/manrope-500.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 600; font-style: normal; font-display: swap; src: url("/fonts/manrope-600.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 700; font-style: normal; font-display: swap; src: url("/fonts/manrope-700.woff2") format("woff2"); }
+@font-face { font-family: "Manrope"; font-weight: 800; font-style: normal; font-display: swap; src: url("/fonts/manrope-800.woff2") format("woff2"); }
+
+/* ── Base reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; overflow: hidden; max-width: 100vw; }
+#root { overflow: hidden; height: 100vh; max-width: 100vw; }
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  overflow-x: hidden;
+  font-family: "Golos Text", "Segoe UI", sans-serif;
+  font-size: var(--font-base);
+  line-height: var(--lh-relaxed);
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(83, 130, 194, 0.12), transparent 32%),
+    radial-gradient(circle at top right, rgba(0, 88, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, var(--bg), var(--bg-muted));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background var(--duration-slow) var(--ease-in-out), color var(--duration-slow) var(--ease-in-out);
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; border: none; background: none; }
+button, input { font: inherit; }
+svg { display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; text-decoration: none; }
+.skip-link:focus-visible { position: fixed; top: 8px; left: 8px; z-index: 9999; width: auto; height: auto; padding: 8px 16px; margin: 0; overflow: visible; clip: auto; white-space: normal; border-radius: 6px; background: var(--bg-surface, #fff); color: var(--text-primary, #0d1b2a); font-size: 14px; font-weight: 500; box-shadow: var(--shadow-popover); outline: 2px solid var(--brand-cta, #0046ff); outline-offset: 2px; }
+
+/* ── Global focus-visible (buttons & roles only, inputs use parent :focus-within) ── */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--brand-cta);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(0, 88, 255, 0.08);
+}
+
+/* ── Global micro-interactions ── */
+.btn:active:not(:disabled),
+.card-action-btn:active {
+  transform: scale(0.95);
+}
+.card-action-btn:hover svg {
+  transform: scale(1.12);
+  transition: transform 150ms ease;
+}
+
+/* ── Brand / font overrides (matching original styles.css) ── */
+:root {
+  --font-family-sans: "Golos Text", "Segoe UI", sans-serif;
+  --font-family-display: "Manrope", "Golos Text", "Segoe UI", sans-serif;
+  --brand-cta: #0058ff;
+  --brand-cta-hover: #0046d8;
+  --brand-cta-soft: rgba(0, 88, 255, 0.12);
+  --brand-ink: #06295f;
+  --brand-line: rgba(0, 88, 255, 0.18);
+
+  /* ── Stage / login dark panel ── */
+  --stage-text: #edf3ff;
+  --stage-accent: #bfd2ff;
+
+  /* ── Toggle switch ── */
+  --toggle-track: #e2e6ee;
+  --toggle-track-active: #1e293b;
+  --toggle-knob-active: #334155;
+
+  /* ── Theme toggle icons ── */
+  --toggle-icon-sun: #f59e0b;
+  --toggle-icon-moon: #c4b5fd;
+  --toggle-icon-inactive-moon: #64748b;
+  --toggle-icon-inactive-sun: #fbbf24;
+
+  /* ── Status palette (light) ── */
+  --status-indexed-text: #059669;
+  --status-indexed-dot: #10b981;
+  --status-pending-text: #d97706;
+  --status-pending-dot: #f59e0b;
+  --status-error-text: #dc2626;
+  --status-error-dot: #ef4444;
+  --status-processing-text: #2563eb;
+  --status-processing-dot: #3b82f6;
+
+  /* ── Type-icon palette ── */
+  --type-pdf: #dc2626;
+  --type-document: #2563eb;
+  --type-video: #7c3aed;
+  --type-audio: #db2777;
+  --type-spreadsheet: #059669;
+  --type-presentation: #d97706;
+
+  /* ── Toast ── */
+  --toast-error-bg: #fef2f2;
+  --toast-error-border: #fecaca;
+
+  /* ── Test option feedback ── */
+  --test-correct-bg: #dcfce7;
+  --test-correct-text: #166534;
+  --test-wrong-bg: #fee2e2;
+  --test-wrong-text: #991b1b;
+
+  /* ── Notification badge ── */
+  --notification-badge-bg: #ef4444;
+}
+body[data-theme="dark"] {
+  --brand-cta: #8db0ff;
+  --brand-cta-hover: #a9c1ff;
+  --brand-cta-soft: rgba(141, 176, 255, 0.16);
+  --brand-ink: #e8f0ff;
+  --brand-line: rgba(141, 176, 255, 0.2);
+
+  --toggle-track: #334155;
+  --toggle-track-active: #1e293b;
+  --toggle-knob-active: #4b5563;
+
+  --status-indexed-text: #34d399;
+  --status-indexed-dot: #10b981;
+  --status-pending-text: #fbbf24;
+  --status-pending-dot: #f59e0b;
+  --status-error-text: #f87171;
+  --status-error-dot: #ef4444;
+  --status-processing-text: #60a5fa;
+  --status-processing-dot: #3b82f6;
+
+  --toast-error-bg: rgba(239, 68, 68, 0.12);
+  --toast-error-border: rgba(239, 68, 68, 0.24);
+
+  --test-correct-bg: rgba(16, 185, 129, 0.15);
+  --test-correct-text: #34d399;
+  --test-wrong-bg: rgba(239, 68, 68, 0.15);
+  --test-wrong-text: #f87171;
+
+  --notification-badge-bg: #ef4444;
+}
+

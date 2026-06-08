@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* ── CSS Modules ── */
+@import "./styles/base.css";          /* fonts, reset, focus, brand overrides */
+@import "./styles/login.css";         /* login screen, stage, fields */
+@import "./styles/workspace.css";     /* workspace layout, tabs, header */
+@import "./styles/materials.css";     /* material cards, dropdowns, advisor toggle */
+@import "./styles/search.css";        /* search bar, advisor answers, filters */
+@import "./styles/grid.css";          /* materials grid/list, rows, bulk actions */
+@import "./styles/guidelines.css";    /* guidelines categories, detail, progress */
+@import "./styles/components.css";    /* status badges, icons, skills, buttons */
+@import "./styles/modal.css";         /* modal, chat, sources, studio, notebook */
+@import "./styles/renderers.css";     /* artifact viewers, test, flashcards */
+@import "./styles/responsive.css";    /* all @media queries + utilities */
