@@ -26,7 +26,7 @@ export const ChatMessage = memo(function ChatMessage({ message, onFollowUp }: Ch
         </div>
       )}
       {message.insufficient_evidence && (
-        <RefusalBox contact={message.contact} />
+        <RefusalBox />
       )}
       {message.follow_ups && message.follow_ups.length > 0 && onFollowUp && (
         <div className="chat-follow-ups">

@@ -86,12 +86,17 @@ export function ChatColumn() {
         });
 
         if (res.insufficient_evidence) {
-          addChatMessage({ role: "assistant", text: res.answer || t("no_results"), follow_ups: res.follow_ups, insufficient_evidence: true, contact: res.contact });
+          addChatMessage({
+            role: "assistant",
+            text: res.answer || t("no_results_retry"),
+            follow_ups: res.follow_ups,
+            insufficient_evidence: true,
+          });
         } else {
           addChatMessage({ role: "assistant", text: res.answer, citations: res.citations, follow_ups: res.follow_ups });
         }
       } catch (err) {
-        addChatMessage({ role: "assistant", text: t("chat_error", "Произошла ошибка. Попробуйте позже.") });
+        addChatMessage({ role: "assistant", text: t("chat_error", "Не удалось получить ответ. Попробуйте ещё раз.") });
         import.meta.env.DEV && console.error("Chat error", err);
       } finally {
         setLoading(false);

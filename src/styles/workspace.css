@@ -270,6 +270,7 @@ body[data-theme="dark"] .workspace-tabs {
 /* Per-tab gradient colors */
 .workspace-tab[data-tab="dashboard"]  { --_grad-from: hsl(220 75% 55%); --_grad-to: hsl(200 80% 50%); }
 .workspace-tab[data-tab="materials"]  { --_grad-from: hsl(250 65% 55%); --_grad-to: hsl(280 60% 60%); }
+.workspace-tab[data-tab="wiki"]       { --_grad-from: hsl(190 65% 45%); --_grad-to: hsl(210 70% 50%); }
 .workspace-tab[data-tab="skills"]     { --_grad-from: hsl(160 60% 42%); --_grad-to: hsl(140 55% 48%); }
 .workspace-tab[data-tab="guidelines"] { --_grad-from: hsl(30 80% 50%);  --_grad-to: hsl(15 75% 55%); }
 

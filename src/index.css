@@ -5,6 +5,7 @@
 @import "./styles/base.css";          /* fonts, reset, focus, brand overrides */
 @import "./styles/login.css";         /* login screen, stage, fields */
 @import "./styles/workspace.css";     /* workspace layout, tabs, header */
+@import "./styles/wiki.css";          /* wiki tab, page view */
 @import "./styles/materials.css";     /* material cards, dropdowns, advisor toggle */
 @import "./styles/search.css";        /* search bar, advisor answers, filters */
 @import "./styles/grid.css";          /* materials grid/list, rows, bulk actions */
