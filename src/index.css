@@ -8,6 +8,7 @@
 @import "./styles/wiki.css";          /* wiki tab, page view */
 @import "./styles/materials.css";     /* material cards, dropdowns, advisor toggle */
 @import "./styles/search.css";        /* search bar, advisor answers, filters */
+@import "./styles/notebooks.css";     /* notebooks panel (LW-N18) */
 @import "./styles/grid.css";          /* materials grid/list, rows, bulk actions */
 @import "./styles/guidelines.css";    /* guidelines categories, detail, progress */
 @import "./styles/components.css";    /* status badges, icons, skills, buttons */

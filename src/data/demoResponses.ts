@@ -5,6 +5,7 @@ export interface InsightPoint {
   body: string;
   metric?: string;
   tag?: string;
+  case_id?: string;
 }
 
 export interface AdvisorResponse {

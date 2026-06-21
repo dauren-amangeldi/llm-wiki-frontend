@@ -1,29 +1,46 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { useMaterialsStore, type Material } from "../../stores/materials";
+import { useMaterialsStore } from "../../stores/materials";
 import { useUiStore } from "../../stores/ui";
 import { useDebounce } from "../../hooks/useDebounce";
-import { useAdvisorDemo } from "../../hooks/useAdvisorDemo";
+import { useAdvisor } from "../../hooks/useAdvisor";
 import { apiFetch } from "../../api/client";
 import { Icon } from "../../components/Icon";
 import { VoiceButton } from "../../components/VoiceButton";
 import { ADVISOR_SUGGESTIONS } from "../../data/advisorSuggestions";
 
+interface WikiSearchHit {
+  slug: string;
+  title: string;
+  snippet: string;
+  scope: string;
+}
+
 export function SearchBar() {
   const { t } = useTranslation();
   const searchQuery = useMaterialsStore((s) => s.searchQuery);
   const setSearchQuery = useMaterialsStore((s) => s.setSearchQuery);
-  const setSearchResults = useMaterialsStore((s) => s.setSearchResults);
   const setSearchPending = useMaterialsStore((s) => s.setSearchPending);
   const scopeFilter = useMaterialsStore((s) => s.scopeFilter);
   const language = useUiStore((s) => s.language);
   const mode = useUiStore((s) => s.mode);
+  const setActiveTab = useUiStore((s) => s.setActiveTab);
   const [localQuery, setLocalQuery] = useState(searchQuery);
   const [focused, setFocused] = useState(false);
+  const [wikiResults, setWikiResults] = useState<WikiSearchHit[]>([]);
   const debouncedQuery = useDebounce(localQuery, 300);
   const wrapRef = useRef<HTMLDivElement>(null);
 
-  const advisor = useAdvisorDemo();
+  const advisor = useAdvisor();
+  const isAdvisor = mode === "advisor";
+
+  function submitSearch() {
+    setSearchQuery(localQuery);
+    setFocused(false);
+    if (isAdvisor && localQuery.trim().length >= 3) {
+      advisor.askQuery(localQuery.trim());
+    }
+  }
 
   /* Reset local query when advisor mode turns OFF */
   useEffect(() => {
@@ -38,10 +55,12 @@ export function SearchBar() {
     setSearchQuery(debouncedQuery);
   }, [debouncedQuery, setSearchQuery]);
 
-  /* Search API call */
+  /* Lexical FTS search — only when advisor is OFF (LW-N6) */
   useEffect(() => {
+    if (isAdvisor) return;
     if (debouncedQuery.length < 3) {
-      setSearchResults(null);
+      setWikiResults([]);
+      setSearchPending(false);
       return;
     }
     const ac = new AbortController();
@@ -49,13 +68,15 @@ export function SearchBar() {
     const params = new URLSearchParams({ q: debouncedQuery, language });
     if (scopeFilter !== "all") params.set("scope", scopeFilter);
 
-    apiFetch<Material[]>(`/api/v1/search?${params}`, { signal: ac.signal })
-      .then((data) => { if (!ac.signal.aborted) setSearchResults(data); })
-      .catch((err) => { if (err?.name !== "AbortError" && !ac.signal.aborted) setSearchResults(null); })
+    apiFetch<WikiSearchHit[]>(`/api/v1/search?${params}`, { signal: ac.signal })
+      .then((data) => { if (!ac.signal.aborted) setWikiResults(data ?? []); })
+      .catch((err) => {
+        if (err?.name !== "AbortError" && !ac.signal.aborted) setWikiResults([]);
+      })
       .finally(() => { if (!ac.signal.aborted) setSearchPending(false); });
 
     return () => { ac.abort(); };
-  }, [debouncedQuery, scopeFilter, language, setSearchResults, setSearchPending]);
+  }, [debouncedQuery, scopeFilter, language, isAdvisor, setSearchPending]);
 
   /* Close suggestions on outside click */
   useEffect(() => {
@@ -67,9 +88,19 @@ export function SearchBar() {
     return () => document.removeEventListener("mousedown", onClick);
   }, [focused]);
 
-  const isAdvisor = mode === "advisor";
   const suggestions = ADVISOR_SUGGESTIONS;
-  const showSuggestions = isAdvisor && focused && !localQuery.trim() && !advisor.advisorAnswer;
+  const showSuggestions = isAdvisor && focused && !localQuery.trim() && !advisor.advisorAnswer && !advisor.refusalMessage;
+  const showWikiResults = !isAdvisor && focused && debouncedQuery.length >= 3;
+
+  function openWikiResult(slug: string) {
+    setActiveTab("wiki");
+    window.history.pushState({}, "", `?tab=wiki&slug=${encodeURIComponent(slug)}`);
+    setFocused(false);
+  }
+
+  function stripMarkup(html: string): string {
+    return html.replace(/<\/?mark>/g, "");
+  }
 
   function handleSuggestionClick(suggestionKey: string) {
     setLocalQuery(t(suggestionKey));
@@ -81,6 +112,7 @@ export function SearchBar() {
     advisor.clearAdvisor();
     setLocalQuery("");
     setSearchQuery("");
+    setWikiResults([]);
   }
 
   return (
@@ -92,7 +124,7 @@ export function SearchBar() {
           value={localQuery}
           onChange={(e) => { setLocalQuery(e.target.value); if (advisor.advisorAnswer) clearAll(); }}
           onFocus={() => setFocused(true)}
-          onKeyDown={(e) => { if (e.key === "Enter") { setSearchQuery(localQuery); setFocused(false); } }}
+          onKeyDown={(e) => { if (e.key === "Enter") submitSearch(); }}
           placeholder={isAdvisor ? t("advisor_search_placeholder", "Спросите советника...") : t("materials_search_placeholder")}
         />
         {(localQuery || advisor.advisorAnswer) && (
@@ -101,7 +133,7 @@ export function SearchBar() {
           </button>
         )}
         <VoiceButton onTranscript={(text) => setLocalQuery(text)} mode="single" />
-        <button type="button" className="search-bar-submit" onClick={() => { setSearchQuery(localQuery); setFocused(false); }} aria-label={t("search", "Поиск")}>
+        <button type="button" className="search-bar-submit" onClick={submitSearch} aria-label={t("search", "Поиск")}>
           <Icon name="arrow-right" size={16} />
         </button>
       </div>
@@ -120,6 +152,41 @@ export function SearchBar() {
                 <span className="advisor-suggestion-text">{t(s.key)}</span>
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* FTS keyword results — advisor OFF only */}
+      {showWikiResults && (
+        <div className="search-fts-results">
+          {wikiResults.length === 0 ? (
+            <div className="search-fts-empty">{t("search_no_results", "Ничего не найдено")}</div>
+          ) : (
+            wikiResults.map((hit) => (
+              <button
+                key={hit.slug}
+                type="button"
+                className="search-fts-item"
+                onClick={() => openWikiResult(hit.slug)}
+              >
+                <Icon name="file-text" size={16} />
+                <div className="search-fts-body">
+                  <div className="search-fts-title">{hit.title}</div>
+                  <div className="search-fts-snippet">{stripMarkup(hit.snippet)}</div>
+                </div>
+                <span className="search-fts-badge">{hit.scope}</span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Advisor refusal */}
+      {advisor.refusalMessage && !advisor.answerLoading && (
+        <div className="advisor-answer">
+          <div className="refusal-box">
+            <span className="refusal-icon"><Icon name="search-x" size={20} /></span>
+            <div>{advisor.refusalMessage}</div>
           </div>
         </div>
       )}
@@ -170,8 +237,11 @@ export function SearchBar() {
                     <button type="button" className="advisor-action-btn" onClick={() => advisor.copyText(`${point.heading}\n${point.body}${point.metric ? `\n→ ${point.metric}` : ""}`)} title={t("copy", "Скопировать")}>
                       <Icon name="clipboard" size={12} />
                     </button>
-                    <button type="button" className="advisor-action-btn" onClick={() => advisor.openCase(i)} title={t("advisor_open_case", "Открыть кейс")}>
+                    <button type="button" className="advisor-action-btn" onClick={() => point.case_id && advisor.openCase(point.case_id)} title={t("advisor_open_case", "Открыть кейс")}>
                       <Icon name="external-link" size={12} />
+                    </button>
+                    <button type="button" className="advisor-action-btn" onClick={() => point.case_id && advisor.openInNotebook(point.case_id, point.heading)} title={t("advisor_open_notebook", "В ноутбук")}>
+                      <Icon name="book" size={12} />
                     </button>
                   </div>
                 </div>

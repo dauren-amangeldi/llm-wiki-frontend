@@ -16,6 +16,7 @@ const MaterialsPanel = lazy(() => import("../materials/MaterialsPanel").then(m =
 const SkillsPanel = lazy(() => import("../skills/SkillsPanel").then(m => ({ default: m.SkillsPanel })));
 const GuidelinesPanel = lazy(() => import("../guidelines/GuidelinesPanel").then(m => ({ default: m.GuidelinesPanel })));
 const WikiPanel = lazy(() => import("../wiki/WikiPanel").then(m => ({ default: m.WikiPanel })));
+const NotebooksPanel = lazy(() => import("../notebooks/NotebooksPanel").then(m => ({ default: m.NotebooksPanel })));
 
 function TabFallback() {
   return (
@@ -37,7 +38,7 @@ export function WorkspaceLayout() {
   }, [activeTab]);
 
   useEffect(() => {
-    const VALID_TABS = ["dashboard", "materials", "wiki", "skills", "guidelines"] as const;
+    const VALID_TABS = ["dashboard", "materials", "wiki", "notebooks", "skills", "guidelines"] as const;
     type ValidTab = typeof VALID_TABS[number];
 
     function getTabFromURL(): ValidTab {
@@ -67,6 +68,7 @@ export function WorkspaceLayout() {
             {activeTab === "dashboard" && <ErrorBoundary><DashboardPanel /></ErrorBoundary>}
             {activeTab === "materials" && <ErrorBoundary><MaterialsPanel /></ErrorBoundary>}
             {activeTab === "wiki" && <ErrorBoundary><WikiPanel /></ErrorBoundary>}
+            {activeTab === "notebooks" && <ErrorBoundary><NotebooksPanel /></ErrorBoundary>}
             {activeTab === "skills" && <ErrorBoundary><SkillsPanel /></ErrorBoundary>}
             {activeTab === "guidelines" && <ErrorBoundary><GuidelinesPanel /></ErrorBoundary>}
           </div>

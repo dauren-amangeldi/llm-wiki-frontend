@@ -5,7 +5,7 @@ type Theme = "light" | "dark";
 type Language = "ru" | "en" | "kk";
 type Mode = "library" | "expert" | "advisor";
 type ViewMode = "grid" | "list";
-type Tab = "dashboard" | "materials" | "wiki" | "skills" | "guidelines";
+type Tab = "dashboard" | "materials" | "wiki" | "notebooks" | "skills" | "guidelines";
 
 interface UiState {
   theme: Theme;

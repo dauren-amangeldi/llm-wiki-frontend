@@ -8,6 +8,7 @@ const TABS = [
   { key: "dashboard" as const, label: "tab_dashboard", icon: "home" },
   { key: "materials" as const, label: "tab_materials", icon: "file-text" },
   { key: "wiki" as const, label: "tab_wiki", icon: "book-open" },
+  { key: "notebooks" as const, label: "tab_notebooks", icon: "book" },
   { key: "skills" as const, label: "tab_skills", icon: "brain", adminOnly: true },
   { key: "guidelines" as const, label: "tab_guidelines", icon: "book-open" },
 ];

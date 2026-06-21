@@ -62,13 +62,17 @@ export function SkillsPanel() {
 
   async function save() {
     if (!editing) return;
-    await apiFetch(`/api/v1/skills/${editing.slug}`, {
-      method: "PUT",
-      body: JSON.stringify({ content }),
-    });
-    toast.show(t("skill_saved", "Скилл сохранён"), "success");
-    setEditing(null);
-    loadSkills();
+    try {
+      await apiFetch(`/api/v1/skills/${editing.slug}`, {
+        method: "PUT",
+        body: JSON.stringify({ content }),
+      });
+      toast.show(t("skill_saved", "Скилл сохранён"), "success");
+      setEditing(null);
+      loadSkills();
+    } catch {
+      toast.show(t("save_error", "Не удалось сохранить"), "error");
+    }
   }
 
   if (editing) {
