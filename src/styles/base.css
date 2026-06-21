@@ -48,9 +48,15 @@ a:focus-visible {
 
 /* ── Global micro-interactions ── */
 .btn:active:not(:disabled),
-.card-action-btn:active {
-  transform: scale(0.95);
+.card-action-btn:active:not(:disabled),
+.search-bar-submit:active:not(:disabled),
+.chat-send:active:not(:disabled),
+.advisor-suggestion-item:active,
+.icon-button:active:not(:disabled) {
+  background: var(--brand-cta-soft);
+  transform: scale(0.96);
 }
+
 .card-action-btn:hover svg {
   transform: scale(1.12);
   transition: transform 150ms ease;

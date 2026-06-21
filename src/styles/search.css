@@ -67,6 +67,15 @@ body[data-theme="dark"] .search-bar:focus-within {
 .search-bar-submit svg { width: 16px; height: 16px; stroke-width: 2.5; }
 .search-bar-submit:hover { background: var(--brand-cta); color: #fff; }
 .search-bar-submit:hover svg { color: #fff; }
+.search-bar-submit:active:not(:disabled),
+.search-bar-submit:hover:active:not(:disabled) {
+  background: var(--brand-cta-soft);
+  color: var(--brand-cta);
+}
+.search-bar-submit:active:not(:disabled) svg,
+.search-bar-submit:hover:active:not(:disabled) svg {
+  color: var(--brand-cta);
+}
 body[data-theme="dark"] .search-bar-submit { border-color: var(--brand-cta); color: var(--brand-cta); }
 body[data-theme="dark"] .search-bar-submit:hover { background: var(--brand-cta); color: var(--btn-primary-text, #fff); }
 body[data-theme="dark"] .search-bar-submit:hover svg { color: var(--btn-primary-text, #fff); }
@@ -129,6 +138,9 @@ body[data-theme="dark"] .search-bar-submit:hover svg { color: var(--btn-primary-
 }
 .advisor-suggestion-item:hover {
   background: var(--surface-hover);
+}
+.advisor-suggestion-item:active {
+  background: var(--brand-cta-soft);
 }
 .advisor-suggestion-icon {
   display: flex;

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiFetch } from "../../api/client";
 import { useSSEStream } from "../../hooks/useSSEStream";
+import { useMaterialsStore } from "../../stores/materials";
 import { useNotebooksStore, type Notebook } from "../../stores/notebooks";
 import { useUiStore } from "../../stores/ui";
 import { useToastStore } from "../../components/Toast";
@@ -24,23 +25,41 @@ export function NotebookView({ notebook, onBack, onRefresh }: NotebookViewProps)
   const { t } = useTranslation();
   const toast = useToastStore();
   const language = useUiStore((s) => s.language);
+  const materials = useMaterialsStore((s) => s.materials);
+  const setMaterials = useMaterialsStore((s) => s.setMaterials);
   const { start, isStreaming } = useSSEStream();
   const upsertNotebook = useNotebooksStore((s) => s.upsertNotebook);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [attachingId, setAttachingId] = useState<string | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const attachedIds = new Set(notebook.files.map((f) => f.file_id));
+  const libraryCandidates = materials.filter((m) => !attachedIds.has(m.document_id));
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    if (materials.length > 0) return;
+    const ac = new AbortController();
+    apiFetch<{ document_id: string; title: string }[]>(
+      `/api/v1/documents?language=${language}`,
+      { signal: ac.signal },
+    )
+      .then((data) => { if (!ac.signal.aborted) setMaterials(data ?? []); })
+      .catch(() => { /* library picker stays empty */ });
+    return () => ac.abort();
+  }, [language, materials.length, setMaterials]);
+
   const handleUpload = useCallback(async (files: File[]) => {
     if (!files.length) return;
     setUploading(true);
     try {
-      let latest = notebook;
       for (const file of files) {
         const form = new FormData();
         form.append("file", file);
@@ -48,7 +67,6 @@ export function NotebookView({ notebook, onBack, onRefresh }: NotebookViewProps)
           `/api/v1/notebooks/${notebook.id}/files`,
           { method: "POST", body: form },
         );
-        latest = updated;
         upsertNotebook(updated);
       }
       toast.show(t("sources_added", "Источники добавлены"), "success");
@@ -58,7 +76,24 @@ export function NotebookView({ notebook, onBack, onRefresh }: NotebookViewProps)
     } finally {
       setUploading(false);
     }
-  }, [notebook, onRefresh, t, toast, upsertNotebook]);
+  }, [notebook.id, onRefresh, t, toast, upsertNotebook]);
+
+  const attachExisting = useCallback(async (fileId: string) => {
+    setAttachingId(fileId);
+    try {
+      const updated = await apiFetch<Notebook>(
+        `/api/v1/notebooks/${notebook.id}/attach`,
+        { method: "POST", body: JSON.stringify({ file_id: fileId }) },
+      );
+      upsertNotebook(updated);
+      toast.show(t("sources_added", "Источники добавлены"), "success");
+      await onRefresh();
+    } catch {
+      toast.show(t("upload_error", "Ошибка загрузки"), "error");
+    } finally {
+      setAttachingId(null);
+    }
+  }, [notebook.id, onRefresh, t, toast, upsertNotebook]);
 
   const sendQuestion = useCallback(async (question: string) => {
     const trimmed = question.trim();
@@ -122,7 +157,46 @@ export function NotebookView({ notebook, onBack, onRefresh }: NotebookViewProps)
               <li className="notebook-source-empty">{t("advisor_no_sources", "Материалы не найдены")}</li>
             )}
           </ul>
-          <DropZone onFilesSelected={handleUpload} uploading={uploading} />
+
+          <div className="notebook-add-sources">
+            <button
+              type="button"
+              className="btn btn-outline notebook-library-toggle"
+              onClick={() => setLibraryOpen((v) => !v)}
+            >
+              <Icon name="folder" size={16} />
+              {t("notebook_attach_from_library", "Добавить из библиотеки")}
+            </button>
+
+            {libraryOpen && (
+              <ul className="notebook-library-list">
+                {libraryCandidates.length === 0 ? (
+                  <li className="notebook-source-empty">
+                    {t("notebook_library_empty", "Нет доступных материалов")}
+                  </li>
+                ) : (
+                  libraryCandidates.map((m) => (
+                    <li key={m.document_id}>
+                      <button
+                        type="button"
+                        className="notebook-library-item"
+                        disabled={attachingId === m.document_id}
+                        onClick={() => void attachExisting(m.document_id)}
+                      >
+                        <Icon name="file-text" size={14} />
+                        <span>{m.title}</span>
+                        {attachingId === m.document_id && (
+                          <Icon name="loader" size={14} className="animate-spin" />
+                        )}
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            )}
+
+            <DropZone onFilesSelected={handleUpload} uploading={uploading} />
+          </div>
         </section>
 
         <section className="notebook-chat">

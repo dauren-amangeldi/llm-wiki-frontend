@@ -1045,7 +1045,17 @@ body[data-theme="dark"] .chat-bubble-user { color: var(--btn-primary-text); }
   box-shadow: var(--btn-primary-shadow);
 }
 .chat-send svg { width: 22px; height: 22px; margin: 0 auto; }
+.chat-send:active:not(:disabled) {
+  background: var(--brand-cta-soft);
+  color: var(--brand-cta);
+  transform: scale(0.96);
+  box-shadow: none;
+}
 body[data-theme="dark"] .chat-send { color: var(--btn-primary-text); }
+body[data-theme="dark"] .chat-send:active:not(:disabled) {
+  background: color-mix(in srgb, var(--brand-cta) 55%, var(--bg, #0d1b2a));
+  color: var(--btn-primary-text);
+}
 
 /* ── Chat compose wrapper (for upward popup) ── */
 .chat-compose-wrap {

@@ -186,6 +186,12 @@ body[data-theme="dark"] .user-menu-lang-btn.active { color: var(--btn-primary-te
   background: var(--brand-cta-soft);
   box-shadow: 0 4px 16px color-mix(in srgb, var(--brand-cta) 20%, transparent);
 }
+.icon-button:active:not(:disabled),
+.icon-button:hover:active:not(:disabled) {
+  transform: scale(0.96);
+  background: var(--brand-cta-soft);
+  box-shadow: var(--shadow-soft);
+}
 .icon-button:focus-visible {
   outline: 2px solid var(--brand-cta);
   outline-offset: 2px;

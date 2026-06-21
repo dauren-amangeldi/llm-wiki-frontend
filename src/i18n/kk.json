@@ -298,6 +298,8 @@
   "adv_pto_integration": "Жүйелер арасындағы қандай интеграция нүктелерін оңтайландыруға болады?",
   "adv_pto_scalability": "Осы деректер бойынша масштабтауға қандай техникалық шектеулер кедергі?",
   "notebook_title": "Чат",
+  "notebook_attach_from_library": "Кітапханадан қосу",
+  "notebook_library_empty": "Қол жетімді материалдар жоқ",
   "studio_title": "Агенттер",
   "studio_podcast": "Подкаст",
   "studio_podcast_sub": "Аудио материал бойынша",

@@ -298,6 +298,8 @@
   "adv_pto_integration": "Which system integration points can be optimized?",
   "adv_pto_scalability": "What technical limitations prevent scaling based on this data?",
   "notebook_title": "Chat",
+  "notebook_attach_from_library": "Add from library",
+  "notebook_library_empty": "No available materials",
   "studio_title": "Agents",
   "studio_podcast": "Podcast",
   "studio_podcast_sub": "Audio from material",

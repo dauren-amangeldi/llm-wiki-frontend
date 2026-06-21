@@ -367,6 +367,8 @@
   "notebook_title_placeholder": "Название ноутбука",
   "notebooks_empty": "Пока нет ноутбуков",
   "sources_added": "Источники добавлены",
+  "notebook_attach_from_library": "Добавить из библиотеки",
+  "notebook_library_empty": "Нет доступных материалов",
   "advisor_followup_placeholder": "Задать уточняющий вопрос...",
   "advisor_followup_label": "уточнение",
   "advisor_followup_prefix": "По вашему вопросу",
